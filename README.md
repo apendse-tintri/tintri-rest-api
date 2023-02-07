@@ -9,7 +9,5 @@ The REST API documentation is located [here](https://tintri.github.io/tintri-res
 ## TCOMS REST API Documentation ##
 The TCOMS REST API documentation is located [here](https://editor.swagger.io/?url=https://raw.githubusercontent.com/apendse-tintri/tintri-rest-api/tcoms-api-changes/docs/tcoms/swagger-doc.json).
 
-[rel path](https://editor.swagger.io/?url=./docs/tcoms/swagger-doc.json)
-
 ## Questions or Comments ##
 For questions and comments, please go to the [Tintri Hub Automation Discussion Group](http://hub.tintri.com/discussions/automation).
