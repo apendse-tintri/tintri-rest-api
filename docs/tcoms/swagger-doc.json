@@ -1,0 +1,1177 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Tintri Container OS Management APIs",
+    "description": "REST APIs supporting management of TxOS container",
+    "version": "v1.1"
+  },
+  "servers": [
+    {
+      "url": "https://apendse-a8-hydra:8085",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/api/tcoms/v1/user": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Returns roles associated with all users",
+        "operationId": "getUsers",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-authorized roles": "ADMIN",
+        "x-since": "v1.1"
+      },
+      "put": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Updates roles of an existing user",
+        "operationId": "updateUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "x-authorized roles": "ADMIN",
+        "x-since": "v1.1"
+      },
+      "post": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Adds a user",
+        "operationId": "addUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "x-authorized roles": "ADMIN",
+        "x-since": "v1.1"
+      }
+    },
+    "/api/tcoms/v1/oob": {
+      "get": {
+        "tags": [
+          "oob-controller"
+        ],
+        "summary": "Returns OOB settings",
+        "description": "Returns OOB settings for given 'param'.",
+        "operationId": "getOOBSettings",
+        "parameters": [
+          {
+            "name": "param",
+            "in": "query",
+            "description": "If 'param' is not passed, all OOB settings are returned.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ALL",
+                "EMAIL",
+                "DNS",
+                "SUPPORT",
+                "DATE_TIME"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplianceSettings"
+                }
+              }
+            }
+          }
+        },
+        "x-authorized roles": "ADMIN, READ_ONLY",
+        "x-since": "v1.1"
+      },
+      "put": {
+        "tags": [
+          "oob-controller"
+        ],
+        "summary": "Persists OOB settings in database.",
+        "description": "Persists OOB settings in database. Does not apply settings to container. Name of the properties to be updated must be passed in 'propertiesToBeUpdated' array.  To delete value assigned to a property, include it in 'propertiesToBeUpdated' array, and set its value to null in the 'objectsWithNewValues'.",
+        "operationId": "updateOOBSettings",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestApplianceSettings"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "x-authorized roles": "ADMIN",
+        "x-since": "v1.1"
+      }
+    },
+    "/api/tcoms/v1/user/resetPassword": {
+      "post": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Resets password",
+        "description": "ADMIN user can reset any user's password. A non-ADMIN user can reset only his/her own password. Resetting admin user password will also reset admin user password on TxOS container, and restart the container.",
+        "operationId": "resetPassword",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCredentials"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-authorized roles": "ADMIN, READ_ONLY",
+        "x-since": "v1.1"
+      }
+    },
+    "/api/tcoms/v1/system/restartWebServer": {
+      "post": {
+        "tags": [
+          "system-controller"
+        ],
+        "summary": "Restarts the TCOMS web server.",
+        "description": "It is an asynchronous operation triggered in background. \nThe operation is executed with a delay of 5 seconds. Delay is configurable using property 'com.tintri.tcoms.service.webserver.restart.delay.ms'. \nCaller can cancel the operation using '/system/restartWebServer/cancel' API",
+        "operationId": "restartWebServer",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestartResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-authorized roles": "ADMIN",
+        "x-since": "v1.1"
+      }
+    },
+    "/api/tcoms/v1/system/restartContainerManager": {
+      "post": {
+        "tags": [
+          "system-controller"
+        ],
+        "summary": "Restarts container management framework that runs TxOS container.",
+        "operationId": "restartContainerManager",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "x-authorized roles": "ADMIN",
+        "x-since": "v1.1"
+      }
+    },
+    "/api/tcoms/v1/system/reboot": {
+      "post": {
+        "tags": [
+          "system-controller"
+        ],
+        "summary": "Reboots the host vm.",
+        "description": "It is an asynchronous operation triggered in background. \nThe operation is executed with a delay of 5 seconds. Delay is configurable using property 'com.tintri.tcoms.service.system.reboot.delay.ms'. \nCaller can cancel the operation using '/system/reboot/cancel' API",
+        "operationId": "reboot",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestartResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-authorized roles": "ADMIN",
+        "x-since": "v1.1"
+      }
+    },
+    "/api/tcoms/v1/session/login": {
+      "post": {
+        "tags": [
+          "session-controller"
+        ],
+        "summary": "Performs user login",
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCredentials"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GrantedAuthority"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-authorized roles": "ADMIN, READ_ONLY",
+        "x-since": "v1.1"
+      }
+    },
+    "/api/tcoms/v1/oob/import": {
+      "post": {
+        "tags": [
+          "oob-controller"
+        ],
+        "summary": "Imports OOB settings.",
+        "description": "Imports OOB settings for use during upgrade.",
+        "operationId": "importOOBSettings",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "x-authorized roles": "ADMIN",
+        "x-since": "v1.1"
+      }
+    },
+    "/api/tcoms/v1/oob/export": {
+      "post": {
+        "tags": [
+          "oob-controller"
+        ],
+        "summary": "Exports OOB settings.",
+        "description": "Exports OOB settings for use during upgrade.",
+        "operationId": "exportOOBSettings",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "x-authorized roles": "ADMIN",
+        "x-since": "v1.1"
+      }
+    },
+    "/api/tcoms/v1/globalVar": {
+      "post": {
+        "tags": [
+          "global-var-controller"
+        ],
+        "summary": "Sets value of variables provided as list",
+        "operationId": "setVariables",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/GlobalVar"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "x-authorized roles": "ADMIN",
+        "x-since": "v1.1"
+      },
+      "delete": {
+        "tags": [
+          "global-var-controller"
+        ],
+        "summary": "Deletes a set of variables",
+        "operationId": "deleteVariables",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "uniqueItems": true,
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "x-authorized roles": "ADMIN",
+        "x-since": "v1.1"
+      }
+    },
+    "/api/tcoms/v1/container/validate": {
+      "post": {
+        "tags": [
+          "container-controller"
+        ],
+        "summary": "Validates host config",
+        "operationId": "validateSystemRequirements",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "x-authorized roles": "ADMIN",
+        "x-since": "v1.1"
+      }
+    },
+    "/api/tcoms/v1/container/stop": {
+      "post": {
+        "tags": [
+          "container-controller"
+        ],
+        "summary": "Stops TxOS container",
+        "operationId": "stopContainer",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "x-authorized roles": "ADMIN",
+        "x-since": "v1.1"
+      }
+    },
+    "/api/tcoms/v1/container/start": {
+      "post": {
+        "tags": [
+          "container-controller"
+        ],
+        "summary": "Starts TxOS container",
+        "operationId": "startContainer",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "x-authorized roles": "ADMIN",
+        "x-since": "v1.1"
+      }
+    },
+    "/api/tcoms/v1/container/setupDataVolume": {
+      "post": {
+        "tags": [
+          "container-controller"
+        ],
+        "summary": "Mounts data volume on the host vm",
+        "operationId": "setupDataVolume",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "x-authorized roles": "ADMIN",
+        "x-since": "v1.1"
+      }
+    },
+    "/api/tcoms/v1/container/restart": {
+      "post": {
+        "tags": [
+          "container-controller"
+        ],
+        "summary": "Restarts TxOS container",
+        "operationId": "restartContainer",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "x-authorized roles": "ADMIN",
+        "x-since": "v1.1"
+      }
+    },
+    "/api/tcoms/v1/container/applyOOBToContainer": {
+      "post": {
+        "tags": [
+          "container-controller"
+        ],
+        "summary": "Applies collected OOB config data to the container. Does not start or restart container.",
+        "operationId": "applyOOBToContainer",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "x-authorized roles": "ADMIN",
+        "x-since": "v1.1"
+      }
+    },
+    "/api/tcoms/v1/autosupport/support": {
+      "post": {
+        "tags": [
+          "autosupport-controller"
+        ],
+        "summary": "Generates support bundle",
+        "operationId": "generateSupportBundle",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-authorized roles": "ADMIN",
+        "x-since": "v1.1"
+      }
+    },
+    "/api/tcoms/v1/autosupport/nightly": {
+      "post": {
+        "tags": [
+          "autosupport-controller"
+        ],
+        "summary": "Generates nightly report",
+        "operationId": "generateNightlyReport",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-authorized roles": "ADMIN",
+        "x-since": "v1.1"
+      }
+    },
+    "/api/tcoms/v1/user/{username}": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Returns roles associated with a user",
+        "operationId": "getUser",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        },
+        "x-authorized roles": "ADMIN",
+        "x-since": "v1.1"
+      },
+      "delete": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Deletes a user",
+        "description": "Deletes a user. 'admin' user cannot be deleted.",
+        "operationId": "deleteUser",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "x-authorized roles": "ADMIN",
+        "x-since": "v1.1"
+      }
+    },
+    "/api/tcoms/v1/session/active": {
+      "get": {
+        "tags": [
+          "session-controller"
+        ],
+        "summary": "Returns active sessions",
+        "operationId": "getActiveSessions",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Session"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-authorized roles": "ADMIN",
+        "x-since": "v1.1"
+      }
+    },
+    "/api/tcoms/v1/oob/timezones": {
+      "get": {
+        "tags": [
+          "oob-controller"
+        ],
+        "summary": "Returns list of timezone IDs supported by TxOS.",
+        "operationId": "getTimezones",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-authorized roles": "ADMIN, READ_ONLY",
+        "x-since": "v1.1"
+      }
+    },
+    "/api/tcoms/v1/oob/missingFields": {
+      "get": {
+        "tags": [
+          "oob-controller"
+        ],
+        "summary": "Returns list of mandatory OOB attributes that have not been updated.",
+        "description": "Returns list of mandatory OOB attributes that have not been updated. List could include\n  1. A single value 'All' in case none of OOB attributes are available in database\n  2. Array of attribute names as defined by class level fields of {@link ApplianceSettings}. Note that nested fields like dnsConfig.primaryDns are not supported\n  3. Empty array indicating all OOB data is available in database",
+        "operationId": "getMissingOOBFields",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-authorized roles": "ADMIN",
+        "x-since": "v1.1"
+      }
+    },
+    "/api/tcoms/v1/globalVar/{key}": {
+      "get": {
+        "tags": [
+          "global-var-controller"
+        ],
+        "summary": "Returns value of variable specified by parameter 'key'",
+        "operationId": "getVariable",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/GlobalVar"
+                }
+              }
+            }
+          }
+        },
+        "x-authorized roles": "ADMIN, READ_ONLY",
+        "x-since": "v1.1"
+      }
+    },
+    "/api/tcoms/v1/container/status": {
+      "get": {
+        "tags": [
+          "container-controller"
+        ],
+        "summary": "Returns state of the host system and TxOS container",
+        "operationId": "getSystemState",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemState"
+                }
+              }
+            }
+          }
+        },
+        "x-authorized roles": "ADMIN, READ_ONLY",
+        "x-since": "v1.1"
+      }
+    },
+    "/api/tcoms/v1/container/hostInfo": {
+      "get": {
+        "tags": [
+          "container-controller"
+        ],
+        "summary": "Returns information about the host system",
+        "operationId": "getSystemInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/HostInfo"
+                }
+              }
+            }
+          }
+        },
+        "x-authorized roles": "ADMIN, READ_ONLY",
+        "x-since": "v1.1"
+      }
+    },
+    "/api/tcoms/v1/autosupport/reportInfo": {
+      "get": {
+        "tags": [
+          "autosupport-controller"
+        ],
+        "summary": "Returns report generation progress",
+        "operationId": "getReportInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-authorized roles": "ADMIN, READ_ONLY",
+        "x-since": "v1.1"
+      }
+    },
+    "/api/tcoms/info": {
+      "get": {
+        "tags": [
+          "api-controller"
+        ],
+        "summary": "Returns version information",
+        "operationId": "getApiInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiInfo"
+                }
+              }
+            }
+          }
+        },
+        "x-authorized roles": "ADMIN, READ_ONLY",
+        "x-since": "v1.1"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "ADMIN",
+                "READ_ONLY"
+              ]
+            }
+          }
+        }
+      },
+      "ApplianceSettings": {
+        "type": "object",
+        "properties": {
+          "serialNumber": {
+            "type": "string"
+          },
+          "eulaAccepted": {
+            "type": "boolean"
+          },
+          "asyncReplicationPort": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "adminPassword": {
+            "type": "string"
+          },
+          "modelType": {
+            "type": "string"
+          },
+          "dnsConfig": {
+            "$ref": "#/components/schemas/DnsConfig"
+          },
+          "lastUpdatedTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "emailConfig": {
+            "$ref": "#/components/schemas/EmailConfig"
+          },
+          "supportConfig": {
+            "$ref": "#/components/schemas/SupportConfig"
+          },
+          "dateTimeConfig": {
+            "$ref": "#/components/schemas/DateTimeConfig"
+          },
+          "adminNetworkConfig": {
+            "$ref": "#/components/schemas/HostInetAddress"
+          },
+          "dataNetworkConfig": {
+            "$ref": "#/components/schemas/HostInetAddress"
+          },
+          "replNetworkConfig": {
+            "$ref": "#/components/schemas/HostInetAddress"
+          }
+        }
+      },
+      "DateTimeConfig": {
+        "type": "object",
+        "properties": {
+          "timezone": {
+            "type": "string"
+          },
+          "ntpPrimary": {
+            "type": "string"
+          },
+          "ntpSecondary": {
+            "type": "string"
+          },
+          "useNtp": {
+            "type": "boolean"
+          },
+          "time": {
+            "type": "string"
+          },
+          "month": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "day": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "year": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lastUpdatedTime": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "DnsConfig": {
+        "type": "object",
+        "properties": {
+          "dnsPrimary": {
+            "type": "string"
+          },
+          "dnsSecondary": {
+            "type": "string"
+          },
+          "lastUpdatedTime": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "EmailConfig": {
+        "type": "object",
+        "properties": {
+          "toEmail": {
+            "type": "string"
+          },
+          "smtpHost": {
+            "type": "string"
+          },
+          "lastUpdatedTime": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "HostInetAddress": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "netmask": {
+            "type": "string"
+          },
+          "family": {
+            "type": "string",
+            "enum": [
+              "IPv4",
+              "IPv6"
+            ]
+          }
+        }
+      },
+      "RequestApplianceSettings": {
+        "type": "object",
+        "properties": {
+          "propertiesToBeUpdated": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "objectsWithNewValues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApplianceSettings"
+            }
+          },
+          "entity": {
+            "$ref": "#/components/schemas/ApplianceSettings"
+          },
+          "entities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApplianceSettings"
+            }
+          },
+          "propertiesSet": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "entityCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SupportConfig": {
+        "type": "object",
+        "properties": {
+          "isEnabled": {
+            "type": "boolean"
+          },
+          "contact": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "location": {
+            "type": "string"
+          },
+          "lastUpdatedTime": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "UserCredentials": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "newPassword": {
+            "type": "string"
+          }
+        }
+      },
+      "RestartResponse": {
+        "type": "object",
+        "properties": {
+          "delayInMillis": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "GrantedAuthority": {
+        "type": "object",
+        "properties": {
+          "authority": {
+            "type": "string"
+          }
+        }
+      },
+      "GlobalVar": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "Session": {
+        "type": "object",
+        "properties": {
+          "lastRequest": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expired": {
+            "type": "boolean"
+          },
+          "username": {
+            "type": "string"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "ADMIN",
+                "READ_ONLY"
+              ]
+            }
+          },
+          "clientId": {
+            "type": "string"
+          }
+        }
+      },
+      "AdditionalInfo": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "SystemState": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "InvalidVmConfig",
+              "ReadyForSystemConfig",
+              "ReadyForContainerConfig",
+              "ReadyToStartContainer",
+              "ContainerStarting",
+              "ContainerHealthy",
+              "ContainerUnhealthy",
+              "ContainerFailed"
+            ]
+          },
+          "tcomsRestartPending": {
+            "type": "boolean"
+          },
+          "containerRestartPending": {
+            "type": "boolean"
+          },
+          "applyOOBConfigPending": {
+            "type": "boolean"
+          },
+          "tcomsRestarting": {
+            "type": "boolean"
+          },
+          "systemRebooting": {
+            "type": "boolean"
+          },
+          "additionalInfo": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdditionalInfo"
+            }
+          }
+        }
+      },
+      "HostComponent": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "HostInfo": {
+        "type": "object",
+        "properties": {
+          "components": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HostComponent"
+            }
+          },
+          "networkInterfaces": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/HostInetAddress"
+              }
+            }
+          }
+        }
+      },
+      "ApiInfo": {
+        "type": "object",
+        "properties": {
+          "supportedVersionSet": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "preferredVersion": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
